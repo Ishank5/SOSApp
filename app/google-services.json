@@ -1,13 +1,32 @@
 {
   "project_info": {
-    "project_number": "703222858705",
-    "project_id": "sosnew-6419a",
-    "storage_bucket": "sosnew-6419a.appspot.com"
+    "project_number": "411548191135",
+    "project_id": "sosapp-9d090",
+    "storage_bucket": "sosapp-9d090.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:703222858705:android:a7b7b7cc6cc5d39966d6f0",
+        "mobilesdk_app_id": "1:411548191135:android:010f5128ba97847e0415aa",
+        "android_client_info": {
+          "package_name": "com.example.chatbox"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAD6eA9os6cWFL8DBif76yQCPmVH1fKLJo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:411548191135:android:c982b75e3c66068c0415aa",
         "android_client_info": {
           "package_name": "com.example.sosapp"
         }
@@ -15,7 +34,26 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAF-VBr9HOozrpdA05TN7jlJni0PzmMLOM"
+          "current_key": "AIzaSyAD6eA9os6cWFL8DBif76yQCPmVH1fKLJo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:411548191135:android:0d94fe7d760411010415aa",
+        "android_client_info": {
+          "package_name": "com.kharga.sostest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAD6eA9os6cWFL8DBif76yQCPmVH1fKLJo"
         }
       ],
       "services": {
