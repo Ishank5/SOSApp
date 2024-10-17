@@ -29,10 +29,7 @@ import androidx.navigation.NavHostController
 @Composable
 fun SOSApp(viewModel: SosViewModel, roomViewModel: RoomViewModel, navController: NavHostController, username: String) {
     val context = LocalContext.current
-    val deviceId = android.provider.Settings.Secure.getString(
-        context.contentResolver,
-        android.provider.Settings.Secure.ANDROID_ID
-    )
+    val deviceId = Globalvariable.username
 
     LaunchedEffect(Unit) {
         val ringtoneUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)

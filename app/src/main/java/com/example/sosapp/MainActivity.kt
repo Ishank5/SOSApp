@@ -137,7 +137,7 @@ fun NavGraph(startDestination: String) {
 
         composable("chatRoomListScreen") {
             val roomViewModel: RoomViewModel = viewModel()
-            ChatRoomListScreen(roomViewModel)
+            ChatRoomListScreen(roomViewModel, navController)
         }
     }
 }
