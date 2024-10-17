@@ -31,7 +31,10 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        val roomViewModel: RoomViewModel by viewModels()
+
         try {
             FirebaseApp.initializeApp(this)
         } catch (e: Exception) {
@@ -128,8 +131,13 @@ fun NavGraph(startDestination: String) {
             val viewModel: SosViewModel = viewModel()
             val username = backStackEntry.arguments?.getString("username")
             if (username != null) {
-                SOSApp(viewModel = viewModel, username = username)
+                SOSApp(viewModel = viewModel, username = username, roomViewModel = RoomViewModel(), navController = navController)
             }
+        }
+
+        composable("chatRoomListScreen") {
+            val roomViewModel: RoomViewModel = viewModel()
+            ChatRoomListScreen(roomViewModel)
         }
     }
 }

@@ -22,10 +22,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun SOSApp(viewModel: SosViewModel,username: String) {
+fun SOSApp(viewModel: SosViewModel, roomViewModel: RoomViewModel, navController: NavHostController, username: String) {
     val context = LocalContext.current
     val deviceId = android.provider.Settings.Secure.getString(
         context.contentResolver,
@@ -52,18 +54,16 @@ fun SOSApp(viewModel: SosViewModel,username: String) {
         }
     }
 
-
-
-
-
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
         Button(
-            onClick = { viewModel.sendSosEvent() },
+            onClick = {
+                viewModel.sendSosEvent()
+                roomViewModel.createRoom(username)
+            },
             colors = ButtonDefaults.buttonColors(Color.Red),
             modifier = Modifier.padding(16.dp)
         ) {
@@ -86,6 +86,15 @@ fun SOSApp(viewModel: SosViewModel,username: String) {
                 fontWeight = FontWeight.Bold
             )
         }
+        Button(
+            onClick = { navController.navigate("chatRoomListScreen") },
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "History",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
-
 }

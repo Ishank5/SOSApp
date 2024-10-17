@@ -2,11 +2,18 @@ package com.example.sosapp
 
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class RoomRepository(private val firestore: FirebaseFirestore) {
 
     suspend fun createRoom(name: String): Result<Unit> = try {
-        val room = Room(name = name)
+        // Get the current date and time
+        val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+
+        val room = Room(name = name, date = currentDate, time = currentTime)
         firestore.collection("rooms").add(room).await()
         Result.Success(Unit)
     } catch (e: Exception) {

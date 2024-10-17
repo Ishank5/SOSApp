@@ -31,7 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun ChatRoomListScreen(
     roomViewModel: RoomViewModel= viewModel(),
-    onJoinClicked: (Room) -> Unit
+//    onJoinClicked: (Room) -> Unit
 ){
     val rooms by roomViewModel.rooms.observeAsState(emptyList())
     var showDialog by remember { mutableStateOf(false)    }
@@ -49,7 +49,9 @@ fun ChatRoomListScreen(
         LazyColumn {
             items(rooms)
             {
-                RoomItem(room = it,onJoinClicked = {onJoinClicked(it)})
+                RoomItem(room = it,onJoinClicked = {
+                   // onJoinClicked(it)
+                })
             }
         }
 
