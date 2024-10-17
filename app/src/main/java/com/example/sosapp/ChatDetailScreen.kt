@@ -20,7 +20,7 @@ import androidx.navigation.NavHostController
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ChatDetailScreen(
+fun ChatDetailScreen(name: String, date: String, time: String,
     navController: NavHostController,
     backStackEntry: NavBackStackEntry
 ) {

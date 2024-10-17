@@ -111,7 +111,6 @@ fun NavGraph(startDestination: String) {
     val navController = rememberNavController()
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-    val isLoggedIn = sharedPreferences.getBoolean("is_logged_in", false)
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable("loginScreen") {
@@ -139,5 +138,15 @@ fun NavGraph(startDestination: String) {
             val roomViewModel: RoomViewModel = viewModel()
             ChatRoomListScreen(roomViewModel, navController)
         }
+
+        composable("chatDetailScreen/{name}/{date}/{time}") { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name")
+            val date = backStackEntry.arguments?.getString("date")
+            val time = backStackEntry.arguments?.getString("time")
+            if (name != null && date != null && time != null) {
+                ChatDetailScreen(name = name, date = date, time = time, navController = navController, backStackEntry = backStackEntry)
+            }
+        }
     }
 }
+
