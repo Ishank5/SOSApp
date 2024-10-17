@@ -47,6 +47,10 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
 
+import android.app.Activity
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
+
 class MainActivity : ComponentActivity() {
     private val sosViewModel: SosViewModel by viewModels()
 
@@ -62,18 +66,38 @@ class MainActivity : ComponentActivity() {
             startService(serviceIntent)
         }
 
+        // Check if it's the first startup and request device admin permission
+        val sharedPreferences = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        if (!sharedPreferences.getBoolean("device_admin_requested", false)) {
+            requestDeviceAdminPermission()
+            sharedPreferences.edit().putBoolean("device_admin_requested", true).apply()
+        }
+
         enableEdgeToEdge()
         setContent {
             SOSAppTheme {
                 SOSApp(sosViewModel)
                 ScheduleSOSWorker()
+                disableBatteryOptimization(LocalContext.current)
             }
         }
     }
+
+    private fun requestDeviceAdminPermission() {
+        val devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        val componentName = ComponentName(this, MyDeviceAdminReceiver::class.java)
+
+        val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+            putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName)
+            putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Device Admin Activation Explanation")
+        }
+        startActivityForResult(intent, 1)
+    }
+
+    private fun enableEdgeToEdge() {
+        // Implementation of edge-to-edge UI, if applicable
+    }
 }
-
-
-
 
 fun disableBatteryOptimization(context: Context) {
     val intent = Intent()
