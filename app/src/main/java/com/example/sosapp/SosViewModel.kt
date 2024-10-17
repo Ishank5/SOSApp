@@ -18,10 +18,7 @@ class SosViewModel(application: Application) : AndroidViewModel(application) {
     private val sosRepository: SosRepository = SosRepository(FirebaseFirestore.getInstance())
 
     @SuppressLint("HardwareIds")
-    private val deviceId: String = Settings.Secure.getString(
-        application.contentResolver,
-        Settings.Secure.ANDROID_ID
-    )
+    private val deviceId: String = Globalvariable.username
 
     fun sendSosEvent() {
         val sosEvent = SosEvent(

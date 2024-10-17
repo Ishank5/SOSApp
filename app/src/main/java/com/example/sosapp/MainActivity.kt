@@ -1,208 +1,135 @@
 package com.example.sosapp
 
-import android.content.Context
-import android.content.Intent
-import android.os.PowerManager
-import android.provider.Settings
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.sosapp.ui.theme.SOSAppTheme
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
-import android.media.RingtoneManager
-import android.net.Uri
-import android.media.Ringtone
-import android.os.Build
-import android.util.Log
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import java.util.concurrent.TimeUnit
-
-import android.app.Activity
+import android.Manifest
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.sosapp.ui.theme.SOSAppTheme
+import com.example.sosapp.ui.theme.ScheduleSOSWorker
+import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
+    private lateinit var sharedPreferences: SharedPreferences
     private val sosViewModel: SosViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        try {
+            FirebaseApp.initializeApp(this)
+        } catch (e: Exception) {
+            Log.e("FirebaseError", "Failed to initialize Firebase", e)
+        }
 
-        // Start the foreground service
-        val serviceIntent = Intent(this, RingtoneForegroundService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent)
+        // Check if the username is 'temp'
+        val username = sharedPreferences.getString("username", "")
+        val isLoggedIn = sharedPreferences.getBoolean("is_logged_in", false)
+
+        if (username == "temp") {
+            // Navigate to the login screen
+            setContent {
+                SOSAppTheme {
+                    NavGraph(startDestination = "loginScreen")
+                    ScheduleSOSWorker()
+                }
+            }
         } else {
-            startService(serviceIntent)
-        }
+            // Check if user is already logged in
+            if (isLoggedIn) {
+                // Navigate to the main screen directly
+                setContent {
+                    SOSAppTheme {
+                        NavGraph(startDestination = "sosAppScreen/${username}")
+                        ScheduleSOSWorker()
+                    }
+                }
+            } else {
+                setContent {
+                    SOSAppTheme {
+                        NavGraph(startDestination = "loginScreen")
+                        ScheduleSOSWorker()
+                    }
+                }
+            }
 
-        // Check if it's the first startup and request device admin permission
-        val sharedPreferences = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        if (!sharedPreferences.getBoolean("device_admin_requested", false)) {
-            requestDeviceAdminPermission()
-            sharedPreferences.edit().putBoolean("device_admin_requested", true).apply()
-        }
+            // Start the foreground service
+            val serviceIntent = Intent(this, RingtoneForegroundService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent)
+            } else {
+                startService(serviceIntent)
+            }
 
-        enableEdgeToEdge()
-        setContent {
-            SOSAppTheme {
-                SOSApp(sosViewModel)
-                ScheduleSOSWorker()
-                disableBatteryOptimization(LocalContext.current)
+            // Check if it's the first startup and request device admin permission
+            val appPrefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            if (!appPrefs.getBoolean("device_admin_requested", false)) {
+                requestDeviceAdminPermission()
+                appPrefs.edit().putBoolean("device_admin_requested", true).apply()
             }
         }
     }
 
     private fun requestDeviceAdminPermission() {
-        val devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        val devicePolicyManager =
+            getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         val componentName = ComponentName(this, MyDeviceAdminReceiver::class.java)
 
         val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
             putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName)
-            putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Device Admin Activation Explanation")
+            putExtra(
+                DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                "Device Admin Activation Explanation"
+            )
         }
         startActivityForResult(intent, 1)
     }
-
-    private fun enableEdgeToEdge() {
-        // Implementation of edge-to-edge UI, if applicable
-    }
 }
-
-fun disableBatteryOptimization(context: Context) {
-    val intent = Intent()
-    val packageName = context.packageName
-    val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-
-    if (pm.isIgnoringBatteryOptimizations(packageName)) {
-        intent.action = Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
-    } else {
-        intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-        intent.data = Uri.parse("package:$packageName")
-    }
-    context.startActivity(intent)
-}
-
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun SOSApp(viewModel: SosViewModel) {
+fun NavGraph(startDestination: String) {
+    val navController = rememberNavController()
     val context = LocalContext.current
-    val deviceId = android.provider.Settings.Secure.getString(
-        context.contentResolver,
-        android.provider.Settings.Secure.ANDROID_ID
-    )
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val isLoggedIn = sharedPreferences.getBoolean("is_logged_in", false)
 
-    LaunchedEffect(Unit) {
-        val ringtoneUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-        val ringtone: Ringtone = RingtoneManager.getRingtone(context, ringtoneUri)
-
-        ringtone.isLooping = true // Set ringtone to loop
-
-        viewModel.listenForSosEvent { sosEvent ->
-            if (sosEvent.triggered && sosEvent.deviceId != deviceId) {  // Check if deviceId matches
-                Toast.makeText(context, "SOS Triggered!", Toast.LENGTH_LONG).show()
-                if (!ringtone.isPlaying) {
-                    ringtone.play()
-                }
-            } else {
-                if (ringtone.isPlaying) {
-                    ringtone.stop()
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable("loginScreen") {
+            LoginScreen(
+                authViewModel = AuthViewModel(),
+                sharedPreferences = sharedPreferences
+            ) {
+                sharedPreferences.edit().putString("username", it).apply()
+                sharedPreferences.edit().putBoolean("is_logged_in", true).apply()
+                navController.navigate("sosAppScreen/$it") {
+                    popUpTo("loginScreen") { inclusive = true }
                 }
             }
         }
-    }
 
-
-
-
-
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Button(
-            onClick = { viewModel.sendSosEvent() },
-            colors = ButtonDefaults.buttonColors(Color.Red),
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = "SOS",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        Button(
-            onClick = { viewModel.stopSosEvent() },
-            colors = ButtonDefaults.buttonColors(Color.Gray),
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = "Stop SOS",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
+        composable("sosAppScreen/{username}") { backStackEntry ->
+            val viewModel: SosViewModel = viewModel()
+            val username = backStackEntry.arguments?.getString("username")
+            if (username != null) {
+                SOSApp(viewModel = viewModel, username = username)
+            }
         }
     }
-
-}////////////////////////////////////////
-
-
-@Composable
-fun ScheduleSOSWorker() {
-    LaunchedEffect(Unit) {
-        val workRequest = PeriodicWorkRequestBuilder<SOSWorker>(15, TimeUnit.MINUTES)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .setRequiresBatteryNotLow(true)
-                    .build()
-            )
-            .build()
-
-        WorkManager.getInstance().enqueueUniquePeriodicWork(
-            "SOSWorker",
-            ExistingPeriodicWorkPolicy.KEEP,
-            workRequest
-        )
-    }
-
 }
-
-
-
-
