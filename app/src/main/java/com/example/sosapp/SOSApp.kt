@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -31,25 +30,25 @@ fun SOSApp(viewModel: SosViewModel, roomViewModel: RoomViewModel, navController:
     val context = LocalContext.current
     val deviceId = Globalvariable.username
 
-    LaunchedEffect(Unit) {
-        val ringtoneUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-        val ringtone: Ringtone = RingtoneManager.getRingtone(context, ringtoneUri)
-
-        ringtone.isLooping = true // Set ringtone to loop
-
-        viewModel.listenForSosEvent { sosEvent ->
-            if (sosEvent.triggered && sosEvent.deviceId != deviceId) {  // Check if deviceId matches
-                Toast.makeText(context, "SOS Triggered!", Toast.LENGTH_LONG).show()
-                if (!ringtone.isPlaying) {
-                    ringtone.play()
-                }
-            } else {
-                if (ringtone.isPlaying) {
-                    ringtone.stop()
-                }
-            }
-        }
-    }
+//    LaunchedEffect(Unit) {
+//        val ringtoneUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+//        val ringtone: Ringtone = RingtoneManager.getRingtone(context, ringtoneUri)
+//
+//        ringtone.isLooping = true // Set ringtone to loop
+//
+//        viewModel.listenForSosEvent { sosEvent ->
+//            if (sosEvent.triggered && sosEvent.deviceId != deviceId) {  // Check if deviceId matches
+//                Toast.makeText(context, "SOS Triggered!", Toast.LENGTH_LONG).show()
+//                if (!ringtone.isPlaying) {
+//                    ringtone.play()
+//                }
+//            } else {
+//                if (ringtone.isPlaying) {
+//                    ringtone.stop()
+//                }
+//            }
+//        }
+//    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
