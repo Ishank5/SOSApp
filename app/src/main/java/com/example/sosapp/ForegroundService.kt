@@ -73,6 +73,9 @@ class SosService : Service() {
             } else {
                 stopRingtone()
             }
+            if(isSosActive == false){
+                stopRingtone()
+            }
         }
     }
 
