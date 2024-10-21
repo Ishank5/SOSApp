@@ -87,7 +87,7 @@ fun SOSApp(viewModel: SosViewModel, roomViewModel: RoomViewModel, navController:
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "History",
+                text = "SOS History",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
