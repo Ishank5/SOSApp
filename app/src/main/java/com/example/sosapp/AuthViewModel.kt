@@ -7,17 +7,17 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel(){
-    private val userRepository1: com.example.sosapp.UserRepository
+    private val userRepository1: UserRepository
 
     init {
-        userRepository1 = com.example.sosapp.UserRepository(
+        userRepository1 = UserRepository(
             com.google.firebase.auth.FirebaseAuth.getInstance(),
-            com.example.sosapp.Injection.instance()
+            Injection.instance()
         )
     }
 
-    private val _authResult = MutableLiveData<com.example.sosapp.Result<Boolean>>()
-    val authResult: LiveData<com.example.sosapp.Result<Boolean>> get() = _authResult
+    private val _authResult = MutableLiveData<Result<Boolean>>()
+    val authResult: LiveData<Result<Boolean>> get() = _authResult
 
     fun login(email: String, password: String) {
         viewModelScope.launch {

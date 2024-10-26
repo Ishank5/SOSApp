@@ -1,16 +1,13 @@
 package com.example.sosapp
 
-import android.Manifest
-import android.app.Activity
+
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.media.Ringtone
-import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -20,14 +17,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -35,11 +29,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
-import com.example.sosapp.Globalvariable.username
-import com.example.sosapp.MainActivity.Companion.REQUEST_CODE_ENABLE_ADMIN
 import com.example.sosapp.ui.theme.SOSAppTheme
-
-
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -92,7 +82,7 @@ class MainActivity : ComponentActivity() {
 
         val intent = Intent()
         val packageName = packageName
-        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
         if (!pm.isIgnoringBatteryOptimizations(packageName)) {
             intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
             intent.data = Uri.parse("package:$packageName")
@@ -106,7 +96,7 @@ class MainActivity : ComponentActivity() {
         }
 
         // Check if device admin is enabled and asking for permissions
-        val devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        val devicePolicyManager = getSystemService(DEVICE_POLICY_SERVICE) as DevicePolicyManager
         val componentName = ComponentName(this, MyDeviceAdminReceiver::class.java)
         if (!devicePolicyManager.isAdminActive(componentName)) {
             requestDeviceAdmin()
@@ -123,15 +113,15 @@ class MainActivity : ComponentActivity() {
             putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Your explanation here")
         }
         startActivityForResult(intent,
-            com.example.sosapp.MainActivity.Companion.REQUEST_CODE_ENABLE_ADMIN
+            REQUEST_CODE_ENABLE_ADMIN
         )
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == com.example.sosapp.MainActivity.Companion.REQUEST_CODE_ENABLE_ADMIN) {
-            if (resultCode == Activity.RESULT_OK) {
+        if (requestCode == REQUEST_CODE_ENABLE_ADMIN) {
+            if (resultCode == RESULT_OK) {
                 Toast.makeText(this, "Device Admin Enabled", Toast.LENGTH_SHORT).show()
                 proceedToApp()
             } else {
@@ -179,7 +169,7 @@ class MainActivity : ComponentActivity() {
         Globalvariable.username = username ?: "temp"
 
         setContent {
-            SOSAppTheme() {
+            SOSAppTheme {
                 NavGraph(sharedPreferences)
             }
         }
@@ -190,7 +180,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun NavGraph(sharedPreferences: SharedPreferences) {
     val navController = rememberNavController()
-    val context = LocalContext.current
+    LocalContext.current
 
     val startDestination = if (sharedPreferences.getBoolean("is_logged_in", false)) {
         "sosAppScreen/${sharedPreferences.getString("username", "")}"

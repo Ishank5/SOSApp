@@ -3,19 +3,11 @@ package com.example.sosapp
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
@@ -28,46 +20,44 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-import java.time.format.TextStyle
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ChatScreen(  roomId: String,
-                 messageViewModel: MessageViewModel = viewModel()
-) {
+fun ChatScreen(roomId: String, messageViewModel: MessageViewModel = viewModel()) {
 
     val text = remember { mutableStateOf("") }
-    val messages  by messageViewModel.messages.observeAsState(emptyList())
+    val messages by messageViewModel.messages.observeAsState(emptyList())
     messageViewModel.setRoomId(roomId)
 
+    // Gradient background in dark slate gray and black
+    val gradientColors = listOf(Color(0xFF2F4F4F), Color.Black)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Brush.verticalGradient(gradientColors))
             .padding(16.dp)
     ) {
         // Display the chat messages
         LazyColumn(
             modifier = Modifier.weight(1f)
         ) {
-            items(messages)
-            {
-                message->
-             ChatMessageItem(message = message.copy(isSentByCurrentUser
-             = message.SenderID==messageViewModel.currentUser.value?.email))
+            items(messages) { message ->
+                ChatMessageItem(
+                    message = message.copy(isSentByCurrentUser = message.SenderID == messageViewModel.currentUser.value?.email)
+                )
             }
-
         }
 
         // Chat input field and send icon
@@ -80,9 +70,10 @@ fun ChatScreen(  roomId: String,
             BasicTextField(
                 value = text.value,
                 onValueChange = { text.value = it },
-                textStyle = androidx.compose.ui.text.TextStyle.Default.copy(fontSize = 16.sp)  ,
+                textStyle = androidx.compose.ui.text.TextStyle.Default.copy(fontSize = 16.sp, color = Color.White),
                 modifier = Modifier
                     .weight(1f)
+                    .background(Color(0xFF2F4F4F), RoundedCornerShape(8.dp)) // Dark slate gray for input field background
                     .padding(8.dp)
             )
 
@@ -93,14 +84,50 @@ fun ChatScreen(  roomId: String,
                         messageViewModel.sendMessage((text.value.trim()))
                         text.value = ""
                     }
-
                 }
-            ){
-                Icon(imageVector = Icons.Default.Send, contentDescription = "Send")
+            ) {
+                Icon(imageVector = Icons.Default.Send, contentDescription = "Send", tint = Color(0xFF8B0000)) // Dark red send icon
             }
         }
     }
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun ChatMessageItem(message: Message) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalAlignment = if (message.isSentByCurrentUser) Alignment.End else Alignment.Start
+    ) {
+        Box(
+            modifier = Modifier
+                .background(
+                    if (message.isSentByCurrentUser) Color.Black // Dark red for sent messages
+                    else Color.DarkGray, // Dark gray for received messages
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(8.dp)
+        ) {
+            Text(
+                text = message.text,
+                color = Color.White,
+                style = androidx.compose.ui.text.TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Normal)
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = message.SenderFirstName,
+            style = androidx.compose.ui.text.TextStyle(fontSize = 12.sp, color = Color.Gray)
+        )
+        Text(
+            text = formatTimestamp(message.timestamp),
+            style = androidx.compose.ui.text.TextStyle(fontSize = 12.sp, color = Color.Gray)
+        )
+    }
+}
+
 @RequiresApi(Build.VERSION_CODES.O)
 private fun formatTimestamp(timestamp: Long): String {
     val messageDateTime =
@@ -130,44 +157,4 @@ private fun formatTime(dateTime: LocalDateTime): String {
 private fun formatDate(dateTime: LocalDateTime): String {
     val formatter = DateTimeFormatter.ofPattern("MMM d, yyyy")
     return formatter.format(dateTime)
-}
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun ChatMessageItem(message: Message) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalAlignment = if (message.isSentByCurrentUser) Alignment.End else Alignment.Start
-    ) {
-        Box(
-            modifier = Modifier
-                .background(
-                    if (message.isSentByCurrentUser) colorResource(id = R.color.purple_700) else Color.Gray,
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .padding(8.dp)
-        ) {
-            Text(
-                text = message.text,
-                color = Color.White,
-                style = androidx.compose.ui.text.TextStyle(fontSize = 16.sp)
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = message.SenderFirstName,
-            style = androidx.compose.ui.text.TextStyle(
-                fontSize = 12.sp,
-                color = Color.Gray
-            )
-        )
-        Text(
-            text = formatTimestamp(message.timestamp), // Replace with actual timestamp logic
-            style = androidx.compose.ui.text.TextStyle(
-                fontSize = 12.sp,
-                color = Color.Gray
-            )
-        )
-    }
 }

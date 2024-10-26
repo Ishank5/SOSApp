@@ -9,12 +9,12 @@ class UserRepository (
     private val auth: com.google.firebase.auth.FirebaseAuth,
     private val firestore: FirebaseFirestore
 ) {
-    suspend fun login(email: String, password: String): com.example.sosapp.Result<Boolean> =
+    suspend fun login(email: String, password: String): Result<Boolean> =
         try {
             auth.signInWithEmailAndPassword(email, password).await()
-            com.example.sosapp.Result.Success(true)
+            Result.Success(true)
         } catch (e: Exception) {
-            com.example.sosapp.Result.Error(e)
+            Result.Error(e)
         }
 
     suspend fun getCurrentUser(): Result<User> = try {

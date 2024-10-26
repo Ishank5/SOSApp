@@ -1,12 +1,10 @@
 package com.example.sosapp
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Build
@@ -14,12 +12,10 @@ import android.os.IBinder
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
-
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 class SosService : Service() {
@@ -96,7 +92,7 @@ class SosService : Service() {
     private fun createNotification(): Notification {
         val notificationChannelId = "SOS_SERVICE_CHANNEL"
         val channel = NotificationChannel(notificationChannelId, "SOS Service", NotificationManager.IMPORTANCE_LOW)
-        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(channel)
 
         return NotificationCompat.Builder(this, notificationChannelId)

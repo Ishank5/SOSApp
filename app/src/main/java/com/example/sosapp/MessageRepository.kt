@@ -1,8 +1,6 @@
 package com.example.sosapp
 
-import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.rpc.context.AttributeContext.Auth
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

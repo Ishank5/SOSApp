@@ -2,7 +2,7 @@ package com.example.sosapp
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.content.Intent
+
 import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -42,7 +42,7 @@ class SosViewModel(application: Application) : AndroidViewModel(application) {
             sosRepository.sendSosEvent(sosEvent)
 
             // Stop the foreground service
-            val context = getApplication<Application>()
+         //   val context = getApplication<Application>()
 //            val serviceIntent = Intent(context, SosService::class.java)
 //            context.stopService(serviceIntent)
         }
