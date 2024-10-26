@@ -33,7 +33,7 @@ import com.example.sosapp.ui.theme.SOSAppTheme
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-
+//unused imports removed
 class MainActivity : ComponentActivity() {
 
     private val sosViewModel: SosViewModel by viewModels()
