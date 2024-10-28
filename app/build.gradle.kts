@@ -108,6 +108,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
+    implementation ("com.google.firebase:firebase-messaging:23.0.0")
     implementation ("androidx.security:security-crypto:1.1.0-alpha06")
 }
